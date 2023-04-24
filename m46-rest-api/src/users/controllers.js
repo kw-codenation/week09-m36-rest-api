@@ -6,7 +6,8 @@ const controllers = {}
 controllers.createUser = async (req, res) =>
 {
     try 
-    {           
+    { 
+        console.log('next called and asked to bring back their clothes')          
         const user = await User.create(req.body)
 
         res.status(201).json({message:'create of user: ' + req.body.username + ' successful', user:user})
@@ -40,7 +41,7 @@ controllers.getUser = async (req, res) =>
     try 
     {   
         const criteria = req.body        
-        const users = await User.findAll(criteria)
+        const users = await User.findAll({where: {username:req.body.username}})
 
         res.status(201).json({message:'get users successful (' + users.length + ' found)', users:users, count:users.length})
     } 
@@ -110,8 +111,6 @@ controllers.deleteUser = async (req, res) =>
             const count = await User.destroy({where:{id:id}})
             res.status(202).json({message:'delete of user: ' + id + ' successful', count:count})
         }
-
-       
     } 
     catch (error)
     {
@@ -119,4 +118,70 @@ controllers.deleteUser = async (req, res) =>
        res.status(501).json({message:error.message, error:error}) 
     }
 }
+
+controllers.login = async (req, res) =>
+{
+    try 
+    {
+           res.status(200).json
+                (
+                    {message:'success'
+                    ,user: 
+                        {id: req.body.id
+                        ,username: req.body.username
+                        ,email: req.body.email
+                        }
+                }
+            ) 
+    } 
+    catch (error) 
+    {
+        console.log(error)
+        res.status(501).json({message:'Login:' + error.message, error:error})                 
+    }
+}
+
+controllers.loadUsers = async (req, res) =>     
+{
+    try 
+    {
+        const users = 
+        [
+            {
+                "id": 1,
+                "username": "Tom Jones",
+                "email": "tom@jones.com",
+                "password": "go away"
+            },
+            {
+                "id": 2,
+                "username": "cilla black",
+                "email": "cilla@black.com",
+                "password": "your my world"
+            },
+            {
+                "id": 3,
+                "username": "idris elba",
+                "email": "idris@elba.com",
+                "password": "very secret"
+            },
+            {
+                "id": 4,
+                "username": "halle berry",
+                "email": "halle@berry.com",
+                "password": "die another day"
+            }
+        ]
+
+        await Book.bulkCreate(users)
+        res.status(201).json({message: users.length + ' books have been loaded on to the the users table successfully'})
+    } 
+    catch (error) 
+    {
+        console.log(error)
+        res.status(501).json({message:error.message, error:error}) 
+    }
+}
+
+
 module.exports = controllers
