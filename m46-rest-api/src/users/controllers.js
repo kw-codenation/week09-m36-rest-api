@@ -1,4 +1,5 @@
 const User = require('./model')
+const jwt = require('jsonwebtoken')
 
 const controllers = {}
 
@@ -6,8 +7,7 @@ const controllers = {}
 controllers.createUser = async (req, res) =>
 {
     try 
-    { 
-        console.log('next called and asked to bring back their clothes')          
+    {          
         const user = await User.create(req.body)
 
         res.status(201).json({message:'create of user: ' + req.body.username + ' successful', user:user})
@@ -119,20 +119,25 @@ controllers.deleteUser = async (req, res) =>
     }
 }
 
+// login procedure
 controllers.login = async (req, res) =>
 {
     try 
     {
-           res.status(200).json
-                (
-                    {message:'success'
-                    ,user: 
-                        {id: req.body.id
-                        ,username: req.body.username
-                        ,email: req.body.email
-                        }
+
+        const token = await jwt.sign({id: req.user.id}, process.env.SECRET_KEY)
+            
+        res.status(200).json
+        (
+            {message:'success'
+            ,user: 
+                {id: req.user.id
+                ,username: req.user.username
+                ,email: req.user.email
+                ,token:token
                 }
-            ) 
+            }
+        ) 
     } 
     catch (error) 
     {
@@ -141,6 +146,8 @@ controllers.login = async (req, res) =>
     }
 }
 
+
+// load many users, which in this case is hard coded in the proc
 controllers.loadUsers = async (req, res) =>     
 {
     try 
